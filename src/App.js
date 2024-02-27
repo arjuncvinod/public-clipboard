@@ -130,17 +130,6 @@ function App() {
           <button onClick={addNote}>Add Note</button>
         </div>
         <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/admin">Admin</Link>
-              </li>
-            </ul>
-          </nav>
-          <hr />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/admin" element={<Admin />} />
