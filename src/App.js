@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import "./App.css"
-
 function App() {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
+  const [showCopyToast, setShowCopyToast] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'notes'), (snapshot) => {
@@ -30,6 +30,20 @@ function App() {
     }
   };
 
+  const copyToClipboard = (text) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    setShowCopyToast(true);
+    setTimeout(() => {
+      setShowCopyToast(false);
+    }, 2000);
+  };
+
   return (
     <div className="App">
       <h1>Public Clipboard</h1>
@@ -45,9 +59,13 @@ function App() {
         <h2>Notes</h2>
         <ul>
           {notes.map((note) => (
-            <li key={note.id}>{note.text}</li>
+            <li key={note.id}>
+              {note.text}
+              <button onClick={() => copyToClipboard(note.text)}>Copy</button>
+            </li>
           ))}
         </ul>
+        {showCopyToast && <div className="copy-toast">Copied to clipboard!</div>}
       </div>
     </div>
   );

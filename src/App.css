@@ -1,4 +1,11 @@
 /* src/App.css */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
 .App {
   text-align: center;
   margin: 20px;
@@ -17,6 +24,7 @@ button {
   padding: 10px 15px;
   cursor: pointer;
   border: none;
+  border-radius: 5px;
 }
 
 button:hover {
@@ -29,10 +37,14 @@ ul {
 }
 
 li {
-  background-color: #f9f9f9;
+  background-color: #fff;
   margin-bottom: 10px;
-  padding: 10px;
+  padding: 15px;
   border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 h1 {
@@ -48,3 +60,37 @@ h2 {
   margin-bottom: 20px;
 }
 
+/* Copy button specific styles */
+li button {
+  background-color: #2196f3;
+  color: white;
+  padding: 8px 12px;
+  margin-left: 10px;
+}
+
+li button:hover {
+  background-color: #0d47a1;
+}
+/* src/App.css */
+/* ... existing styles ... */
+
+.copy-toast {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideInUp 0.5s ease-out;
+
+  @keyframes slideInUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
