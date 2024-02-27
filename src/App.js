@@ -1,15 +1,24 @@
 // src/App.js
-import React, { useState, useEffect } from 'react';
-import { db } from './firebase';
-import { onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import "./App.css"
-function App() {
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { db } from "./firebase";
+import {
+  onSnapshot,
+  collection,
+  addDoc,
+  serverTimestamp,
+  deleteDoc,
+  getDocs,
+  doc,
+} from "firebase/firestore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+function Admin() {
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('');
-  const [showCopyToast, setShowCopyToast] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'notes'), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db, "notes"), (snapshot) => {
       const newNotes = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -20,54 +29,126 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const addNote = async () => {
-    if (newNote.trim() !== '') {
-      await addDoc(collection(db, 'notes'), {
-        text: newNote,
-        timestamp: serverTimestamp(),
-      });
-      setNewNote('');
+  const deleteNote = async (noteId) => {
+    try {
+      await deleteDoc(doc(db, "notes", noteId));
+      // Refresh notes after deletion
+      const snapshot = await getDocs(collection(db, "notes"));
+      const newNotes = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotes(newNotes);
+    } catch (error) {
+      console.error("Error deleting note:", error);
     }
   };
 
+  return (
+    <div>
+      <h2>Admin Panel</h2>
+      <ul>
+        {notes.map((note) => (
+          <li key={note.id}>
+            {note.text}
+            <button onClick={() => deleteNote(note.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Home() {
+  const [notes, setNotes] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "notes"), (snapshot) => {
+      const newNotes = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotes(newNotes);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const copyToClipboard = (text) => {
-    const textarea = document.createElement('textarea');
+    const textarea = document.createElement("textarea");
     textarea.value = text;
     document.body.appendChild(textarea);
     textarea.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(textarea);
 
-    setShowCopyToast(true);
-    setTimeout(() => {
-      setShowCopyToast(false);
-    }, 2000);
+    toast.success("Copied to clipboard!", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+    });
   };
 
   return (
-    <div className="App">
-      <h1>Public Clipboard</h1>
-      <div>
-        <textarea
-          rows="4"
-          value={newNote}
-          onChange={(e) => setNewNote(e.target.value)}
-        />
-        <button onClick={addNote}>Add Note</button>
-      </div>
-      <div>
-        <h2>Notes</h2>
-        <ul>
-          {notes.map((note) => (
-            <li key={note.id}>
-              {note.text}
-              <button onClick={() => copyToClipboard(note.text)}>Copy</button>
-            </li>
-          ))}
-        </ul>
-        {showCopyToast && <div className="copy-toast">Copied to clipboard!</div>}
-      </div>
+    <div>
+      <h2>Notes</h2>
+      <ul>
+        {notes.map((note) => (
+          <li key={note.id}>
+            {note.text}
+            <button onClick={() => copyToClipboard(note.text)}>Copy</button>
+          </li>
+        ))}
+      </ul>
     </div>
+  );
+}
+
+function App() {
+  const [newNote, setNewNote] = useState("");
+
+  const addNote = async () => {
+    if (newNote.trim() !== "") {
+      await addDoc(collection(db, "notes"), {
+        text: newNote,
+        timestamp: serverTimestamp(),
+      });
+      setNewNote("");
+    }
+  };
+
+  return (
+    <Router>
+      <div className="App">
+        <h1>Public Clipboard</h1>
+        <div>
+          <textarea
+            rows="4"
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
+          />
+          <button onClick={addNote}>Add Note</button>
+        </div>
+        <div>
+          <nav>
+            <ul>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/admin">Admin</Link>
+              </li>
+            </ul>
+          </nav>
+          <hr />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+        </div>
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      </div>
+    </Router>
   );
 }
 
