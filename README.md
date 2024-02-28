@@ -1,7 +1,10 @@
 # Public Clipboard App
 
 Public Clipboard is a simple React application that allows users to manage clipboard notes.<br>
+
 [Live demo](https://public-clipboard.vercel.app/)
+
+
 ![public-clipboard vercel app_](https://github.com/arjuncvinod/public-clipboard/assets/68469520/2dce8d6b-667d-4a74-9955-059c5bbdde88)
 
 ## Features
