@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { db } from "./firebase";
 import {
   onSnapshot,
@@ -11,9 +11,10 @@ import {
   getDocs,
   doc,
 } from "firebase/firestore";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import Home from "./components/Home";
 function Admin() {
   const [notes, setNotes] = useState([]);
 
@@ -51,52 +52,7 @@ function Admin() {
         {notes.map((note) => (
           <li key={note.id}>
             {note.text}
-            <button onClick={() => deleteNote(note.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Home() {
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "notes"), (snapshot) => {
-      const newNotes = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setNotes(newNotes);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const copyToClipboard = (text) => {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-
-    toast.success("Copied to clipboard!", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-    });
-  };
-
-  return (
-    <div>
-      <h2>Notes</h2>
-      <ul>
-        {notes.map((note) => (
-          <li key={note.id}>
-            {note.text}
-            <button onClick={() => copyToClipboard(note.text)}>Copy</button>
+            <button onClick={() => deleteNote(note.id)} className="delete-btn">Delete</button>
           </li>
         ))}
       </ul>
