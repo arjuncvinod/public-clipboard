@@ -1,6 +1,5 @@
-/* src/App.css */
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
@@ -16,6 +15,11 @@ textarea {
   padding: 10px;
   margin-bottom: 10px;
   box-sizing: border-box;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.16);
+  min-height: 150px;
 }
 
 button {
@@ -56,7 +60,6 @@ h2 {
   margin-top: 20px;
 }
 
-/* Copy button specific styles */
 li button {
   background-color: #2196f3;
   color: white;
@@ -67,9 +70,6 @@ li button {
 li button:hover {
   background-color: #0d47a1;
 }
-/* src/App.css */
-/* ... existing styles ... */
-
 .copy-toast {
   position: fixed;
   top: 10px;
@@ -89,4 +89,11 @@ li button:hover {
       transform: translateY(0);
     }
   }
+}
+.delete-btn {
+  color: white;
+  background-color: rgb(249, 26, 26);
+}
+.delete-btn:hover {
+  background-color: rgb(219, 19, 19);
 }
