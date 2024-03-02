@@ -15,6 +15,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Home from "./components/Home";
+import Particle from "./components/Particle";
 function Admin() {
   const [notes, setNotes] = useState([]);
 
@@ -52,7 +53,9 @@ function Admin() {
         {notes.map((note) => (
           <li key={note.id}>
             {note.text}
-            <button onClick={() => deleteNote(note.id)} className="delete-btn">Delete</button>
+            <button onClick={() => deleteNote(note.id)} className="delete-btn">
+              Delete
+            </button>
           </li>
         ))}
       </ul>
@@ -77,11 +80,13 @@ function App() {
     <Router>
       <div className="App">
         <h1>Public Clipboard</h1>
+        <Particle />
         <div>
           <textarea
             rows="4"
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
+            placeholder="Enter your note..."
           />
           <button onClick={addNote}>Add Note</button>
         </div>
