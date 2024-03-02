@@ -3,11 +3,15 @@ body {
   background-color: #f4f4f4;
   margin: 0;
   padding: 0;
+  padding: 2%;
 }
 
 .App {
   text-align: center;
   margin: 20px;
+}
+h1 {
+  color: white;
 }
 
 textarea {
@@ -19,7 +23,10 @@ textarea {
   border: none;
   outline: none;
   box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.16);
-  min-height: 150px;
+  /* min-height: 150px; */
+  background-color: rgba(0, 0, 0, 0.801);
+  color: white;
+  border: 2px solid white;
 }
 
 button {
@@ -41,8 +48,10 @@ ul {
 }
 
 li {
-  background-color: #fff;
-  margin-bottom: 10px;
+  background-color: rgba(0, 0, 0, 0.834);
+  color: white;
+  border: 1px solid white;
+  margin-bottom: 20px;
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -52,7 +61,7 @@ li {
 }
 
 h1 {
-  color: #333;
+  color: white;
 }
 
 h2 {
