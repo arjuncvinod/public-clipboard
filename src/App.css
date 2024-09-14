@@ -14,7 +14,7 @@ h1 {
   color: white;
 }
 
-textarea {
+textarea ,input{
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
@@ -27,6 +27,7 @@ textarea {
   background-color: rgba(0, 0, 0, 0.801);
   color: white;
   border: 2px solid white;
+  
 }
 
 button {
@@ -35,7 +36,7 @@ button {
   padding: 10px 15px;
   cursor: pointer;
   border: none;
-  border-radius: 5px;
+  border-radius: 5px;margin: 2rem 0;
 }
 
 button:hover {
@@ -59,7 +60,18 @@ li {
   justify-content: space-between;
   align-items: center;
 }
+.titleAndContent{
+ text-align: start;
+ display: flex;
+ flex-direction: column;
+ justify-content: flex-start;
 
+}
+.previewAndButton{
+  width: 54%;
+  display: flex;
+  justify-content: space-between;
+}
 h1 {
   color: white;
 }
