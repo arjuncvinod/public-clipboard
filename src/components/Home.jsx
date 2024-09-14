@@ -36,28 +36,17 @@ export default function Home() {
     });
     
   };
-  const downloadFile = (url, filename) => {
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(link.href);
-      })
-      .catch(error => {
-        console.error('Download error:', error);
-        toast.error('Failed to download file.', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-        });
-      });
+  const getDirectDownloadURL = (url) => {
+    return url.includes('?alt=media') ? url : `${url}?alt=media`;
   };
-
+  const handleDownload = (url) => {
+    const a = document.createElement('a');
+    a.href = getDirectDownloadURL(url);
+    a.download = url.split('/').pop(); // Use file name from URL
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
   return (
     <div>
       <h2>Notes</h2>
@@ -71,12 +60,15 @@ export default function Home() {
             </div>
             {note.fileURL && (
               <div className="previewAndButton">
+              <a href={note.fileURL}>
               <img
                   src={isImage(note.text) ? note.fileURL : fileImg}
                   alt={note.title || "Preview"}
                   style={{ width: "100px", height: "100px" }}
                 />
-                <button onClick={() => downloadFile(note.fileURL, note.title || "file")}>
+                </a>
+                
+                <button onClick={() => handleDownload(note.fileURL)}>
                   Download
                 </button>
               </div>

@@ -91,6 +91,9 @@ li button {
 li button:hover {
   background-color: #0d47a1;
 }
+img{
+  object-fit: cover;
+}
 .copy-toast {
   position: fixed;
   top: 10px;
