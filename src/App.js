@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { db, storage } from "./firebase";
@@ -10,9 +11,10 @@ import {
   getDocs,
   doc,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios"; // Import Axios
 import "./App.css";
 import Home from "./components/Home";
 import Particle from "./components/Particle";
@@ -76,50 +78,98 @@ function App() {
   const [newNote, setNewNote] = useState("");
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [uploadSpeed, setUploadSpeed] = useState(0);
+  const [uploadTask, setUploadTask] = useState(null);
+  const [isCanceled, setIsCanceled] = useState(false);
+  const [ipAddress, setIpAddress] = useState(""); // State to hold the IP address
 
-  // Function to get the user's IP address
-  const getUserIP = async () => {
-    try {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
-    } catch (error) {
-      console.error("Error fetching IP address:", error);
-      return null; // Return null if there's an error
-    }
-  };
+  useEffect(() => {
+    // Fetch user's IP address on component mount
+    const fetchIpAddress = async () => {
+      try {
+        const response = await axios.get("https://api.ipify.org?format=json");
+        setIpAddress(response.data.ip); // Set IP address
+      } catch (error) {
+        console.error("Error fetching IP address:", error);
+      }
+    };
+
+    fetchIpAddress();
+  }, []);
 
   const addNote = async () => {
     if (newNote.trim() !== "") {
-      const userIP = await getUserIP();  // Get user's IP address
       await addDoc(collection(db, "notes"), {
         title,
         text: newNote,
-        ipAddress: userIP,  // Store IP address
+        ipAddress, // Include IP address in the note
         timestamp: serverTimestamp(),
       });
       setNewNote("");
-      setTitle(""); // Reset title input
+      setTitle("");
     }
   };
 
   const handleFileUpload = async () => {
     if (file) {
       const fileRef = ref(storage, `files/${file.name}`);
-      await uploadBytes(fileRef, file);
-      const fileURL = await getDownloadURL(fileRef);
-      const userIP = await getUserIP();  // Get user's IP address
+      const uploadTask = uploadBytesResumable(fileRef, file);
+      setUploadTask(uploadTask);
+      setIsCanceled(false);
 
-      await addDoc(collection(db, "notes"), {
-        title,
-        text: file.name,
-        fileURL,
-        ipAddress: userIP,  // Store IP address
-        timestamp: serverTimestamp(),
-      });
-      toast.success("File uploaded successfully!");
-      setFile(null); // Reset file input
-      setTitle(""); // Reset title input
+      const startTime = Date.now();
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+
+          const elapsedTime = (Date.now() - startTime) / 1000;
+          const speed = (snapshot.bytesTransferred / 1024) / elapsedTime;
+          setUploadSpeed(speed.toFixed(2));
+        },
+        (error) => {
+          if (error.code === "storage/canceled") {
+            toast.info("Upload canceled!");
+          } else {
+            toast.error("File upload failed!");
+            console.error("Error during file upload:", error);
+          }
+        },
+        async () => {
+          if (isCanceled) return;
+
+          const fileURL = await getDownloadURL(fileRef);
+          await addDoc(collection(db, "notes"), {
+            title,
+            text: file.name,
+            fileURL,
+            ipAddress, // Include IP address in the note
+            timestamp: serverTimestamp(),
+          });
+          toast.success("File uploaded successfully!");
+          setFile(null);
+          setTitle("");
+          setProgress(0);
+          setUploadSpeed(0);
+          setUploadTask(null);
+        }
+      );
+    }
+  };
+
+  const cancelUpload = () => {
+    if (uploadTask) {
+      uploadTask.cancel();
+      setIsCanceled(true);
+      setFile(null);
+      setProgress(0);
+      setUploadSpeed(0);
+      setUploadTask(null);
     }
   };
 
@@ -144,11 +194,20 @@ function App() {
           <button onClick={addNote}>Add Note</button>
         </div>
         <div>
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <button onClick={handleFileUpload}>Upload File</button>
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          {/* Conditional rendering for Upload and Cancel buttons */}
+          {!uploadTask ? (
+            <button onClick={handleFileUpload}>Upload File</button>
+          ) : (
+            <button style={{backgroundColor:"red"}} onClick={cancelUpload}>Cancel Upload</button>
+          )}
+     {progress > 0 && (
+            <div className="progressBar">
+              <progress value={progress} max="100"></progress>
+              <span>{progress}%</span>
+              <div>Speed: {uploadSpeed} KB/s</div>
+            </div>
+          )}
         </div>
         <div>
           <Routes>
