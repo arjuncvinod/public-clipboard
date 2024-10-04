@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import { onSnapshot, collection } from "firebase/firestore";
 import { toast } from "react-toastify";
 import fileImg from "../assets/files-icon.png"
+
 export default function Home() {
   const [notes, setNotes] = useState([]);
 
@@ -21,6 +22,7 @@ export default function Home() {
   const isImage = (url) => {
     return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
   };
+
   const copyToClipboard = (text) => {
     const textarea = document.createElement("textarea");
     textarea.value = text;
@@ -34,11 +36,12 @@ export default function Home() {
       autoClose: 3000,
       hideProgressBar: true,
     });
-    
   };
+
   const getDirectDownloadURL = (url) => {
     return url.includes('?alt=media') ? url : `${url}?alt=media`;
   };
+
   const handleDownload = (url) => {
     const a = document.createElement('a');
     a.href = getDirectDownloadURL(url);
@@ -47,34 +50,37 @@ export default function Home() {
     a.click();
     document.body.removeChild(a);
   };
+
   return (
     <div>
       <h2>Notes</h2>
       <ul>
         {notes.map((note) => (
           <li key={note.id}>
-          <div className="titleAndContent">
-            {note.title && <strong>{note.title}</strong>}
-            <br />
-            {note.text}
+            <div className="titleAndContent">
+              {note.title && <strong>{note.title}</strong>}
+              <br />
+              {note.text}
             </div>
             {note.fileURL && (
               <div className="previewAndButton">
-              <a href={note.fileURL}>
-              <img
-                  src={isImage(note.text) ? note.fileURL : fileImg}
-                  alt={note.title || "Preview"}
-                  style={{ width: "100px", height: "100px" }}
-                />
+                <a href={note.fileURL}>
+                  <img
+                    src={isImage(note.text) ? note.fileURL : fileImg}
+                    alt={note.title || "Preview"}
+                    style={{ width: "100px", height: "100px" }}
+                  />
                 </a>
-                
                 <button onClick={() => handleDownload(note.fileURL)}>
                   Download
                 </button>
               </div>
             )}
-            {!note.fileURL &&(
-            <button onClick={() => copyToClipboard(note.text)}>Copy</button>)}
+            {!note.fileURL && (
+              <button onClick={() => copyToClipboard(note.text)}>
+                Copy
+              </button>
+            )}
           </li>
         ))}
       </ul>

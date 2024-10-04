@@ -75,13 +75,27 @@ function Admin() {
 function App() {
   const [newNote, setNewNote] = useState("");
   const [file, setFile] = useState(null);
-  const [title, setTitle] = useState(""); // Add title state
+  const [title, setTitle] = useState("");
+
+  // Function to get the user's IP address
+  const getUserIP = async () => {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      console.error("Error fetching IP address:", error);
+      return null; // Return null if there's an error
+    }
+  };
 
   const addNote = async () => {
     if (newNote.trim() !== "") {
+      const userIP = await getUserIP();  // Get user's IP address
       await addDoc(collection(db, "notes"), {
         title,
         text: newNote,
+        ipAddress: userIP,  // Store IP address
         timestamp: serverTimestamp(),
       });
       setNewNote("");
@@ -94,11 +108,13 @@ function App() {
       const fileRef = ref(storage, `files/${file.name}`);
       await uploadBytes(fileRef, file);
       const fileURL = await getDownloadURL(fileRef);
+      const userIP = await getUserIP();  // Get user's IP address
 
       await addDoc(collection(db, "notes"), {
         title,
         text: file.name,
         fileURL,
+        ipAddress: userIP,  // Store IP address
         timestamp: serverTimestamp(),
       });
       toast.success("File uploaded successfully!");
